@@ -26,11 +26,12 @@ env/
 ENV/
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
 *~
+# Keep .vscode for team debugging configs
+# .vscode/
 
 # Jupyter Notebook
 .ipynb_checkpoints

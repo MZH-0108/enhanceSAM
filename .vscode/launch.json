@@ -1,0 +1,70 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Train Model",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/train.py",
+      "args": [
+        "--data_root", "data/",
+        "--sam_checkpoint", "sam_vit_b_01ec64.pth",
+        "--batch_size", "2",
+        "--epochs", "2",
+        "--lr", "1e-4"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Evaluate Model",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/eval.py",
+      "args": [
+        "--checkpoint", "checkpoints/best_model.pth",
+        "--sam_checkpoint", "sam_vit_b_01ec64.pth",
+        "--split", "val",
+        "--output", "results/eval_val.json"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Predict Single Image",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/predict.py",
+      "args": [
+        "--image", "data/test/images/sample.jpg",
+        "--checkpoint", "checkpoints/best_model.pth",
+        "--sam_checkpoint", "sam_vit_b_01ec64.pth",
+        "--output", "output.png"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Run Unit Tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/",
+        "-v",
+        "--cov=models",
+        "--cov=utils"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Python: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ]
+}
