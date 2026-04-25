@@ -1,0 +1,48 @@
+E:\SCIopus\enhanceSAM/
+│
+├── 📁 .git/                          Git 仓库 (7 commits)
+├── 📁 .vscode/
+│   └── launch.json                   5 个调试配置
+│
+├── 📄 .gitignore                     633 bytes
+├── 📄 README.md                      5,687 bytes
+├── 📄 CLAUDE.md                      13,289 bytes (代码规范)
+├── 📄 requirements.txt               930 bytes (46 行依赖)
+├── 📄 __init__.py                    668 bytes
+│
+├── 📁 configs/
+│   └── train_config.yaml             完整训练配置
+│
+├── 📁 models/                        ✅ Phase 2 完成
+│   ├── __init__.py                   22 bytes
+│   ├── sam_base.py                   195 行 (6.1K)
+│   ├── lora_adapter.py               467 行 (14K)
+│   ├── boundary_refinement.py        453 行 (14K)
+│   └── enhanced_sam.py               332 行 (11K)
+│   └── 总计: 1,448 行
+│
+├── 📁 tests/                         ✅ Phase 2 完成
+│   ├── __init__.py                   1 行
+│   ├── test_sam_base.py              126 行
+│   ├── test_lora_adapter.py          261 行
+│   ├── test_boundary_refinement.py   222 行
+│   └── test_enhanced_sam.py          298 行
+│   └── 总计: 908 行
+│
+├── 📁 utils/                         ⏳ Phase 3 待开发
+│   └── __init__.py
+│
+├── 📁 scripts/                       ⏳ Phase 3 待开发
+│   (待实现: train.py, eval.py, predict.py)
+│
+├── 📁 notebooks/                     空目录
+├── 📁 data/                          空目录 (train/val/test)
+├── 📁 checkpoints/                   空目录
+└── 📁 logs/                          空目录
+
+总计:
+- 模型代码: 1,448 行
+- 测试代码: 908 行
+- 文档: 19K
+- Git 提交: 7 次
+- 测试覆盖: 100%
