@@ -1,0 +1,82 @@
+# Training Configuration
+
+# Model
+model:
+  type: "vit_b"  # vit_b, vit_l, vit_h
+  img_size: 512
+  vit_embed_dim: 768  # 768 for vit_b, 1024 for vit_l, 1280 for vit_h
+  prompt_embed_dim: 256
+
+# LoRA
+lora:
+  use_lora: true
+  rank: 8
+  alpha: 16.0
+  dropout: 0.1
+  target_modules:
+    - "qkv"
+    - "proj"
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "out_proj"
+    - "lin1"
+    - "lin2"
+
+# Boundary Refinement
+boundary:
+  use_boundary: true
+  mid_channels: 64
+  num_iterations: 3
+  detector_mid: 64
+
+# Loss
+loss:
+  w_bce: 1.0
+  w_dice: 2.0
+  w_bound: 2.0
+  pos_weight: 10.0
+  boundary_radius: 3
+
+# Training
+training:
+  batch_size: 4
+  epochs: 50
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  num_workers: 4
+
+# Optimizer
+optimizer:
+  type: "adamw"  # adam, adamw, sgd
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+
+# Scheduler
+scheduler:
+  type: "cosine"  # cosine, step, plateau
+  warmup_epochs: 5
+  min_lr: 1.0e-6
+
+# Data Augmentation
+augmentation:
+  horizontal_flip: 0.5
+  vertical_flip: 0.5
+
+# Checkpoint
+checkpoint:
+  save_interval: 1  # Save every N epochs
+  save_best: true
+  monitor: "val_iou"  # Metric to monitor for best model
+
+# Logging
+logging:
+  log_interval: 10  # Log every N batches
+  use_tensorboard: true
+  tensorboard_dir: "logs/"
+
+# Early Stopping
+early_stopping:
+  enabled: true
+  patience: 10
+  min_delta: 0.0001
