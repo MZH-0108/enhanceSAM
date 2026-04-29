@@ -25,12 +25,10 @@
 
 - 🚀 **推理高效**: GPU 上单张图像推理仅需 ~36ms
 - 💾 **参数高效**: 仅 2.4M 可训练参数（占总参数 1.69%）
-- 🎯 **边界精确**: Boundary-IoU 高达 0.92+
-- 📊 **小样本友好**: 通过 LoRA 有效避免过拟合
 
 ### 🎓 研究目标
 
-本项目用于 **SCI 期刊论文发表**，核心创新点：
+核心创新点：
 1. **LoRA + SAM**: 将参数高效微调引入 SAM 的裂缝分割任务
 2. **边界精细化**: 基于 Sobel 算子的迭代式边界优化
 3. **端到端训练**: 无需提示，全自动裂缝识别
@@ -243,12 +241,10 @@ This project is based on Meta's **Segment Anything Model (SAM)**, performing par
 
 - 🚀 **Fast Inference**: ~36ms per image on GPU
 - 💾 **Parameter Efficient**: Only 2.4M trainable parameters (1.69%)
-- 🎯 **Precise Boundaries**: Boundary-IoU > 0.92
-- 📊 **Small Dataset Friendly**: Avoids overfitting through LoRA
 
 ### 🎓 Research Goals
 
-This project targets **SCI journal publication** with the following innovations:
+The following innovations:
 1. **LoRA + SAM**: Apply parameter-efficient fine-tuning to SAM for crack segmentation
 2. **Boundary Refinement**: Iterative boundary optimization with Sobel-initialized convolutions
 3. **End-to-end Training**: Fully automatic crack detection without prompts
