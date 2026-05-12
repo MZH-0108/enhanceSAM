@@ -57,6 +57,10 @@ Thumbs.db
 *.log
 *.tmp
 *.bak
+.tmp/
+.tmp_ppt/
+.vendor/
+tmp-ppt/
 
 # Results
 results/

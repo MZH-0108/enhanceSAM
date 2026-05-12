@@ -33,6 +33,7 @@ Format and lint before opening a PR.
 - Use type hints for public APIs and clear docstrings on modules/classes/functions.
 - Naming: modules/files `snake_case`, classes `PascalCase`, functions/variables `snake_case`, constants `UPPER_SNAKE_CASE`.
 - Keep tensor contracts explicit (shape expectations and key names such as `masks`, `iou_pred`, `refined_mask`).
+- **注释规范（强制）**：新增或修改的核心代码必须提供详细中文注释，至少说明“这段代码做什么、输入输出是什么、为什么这样做”；复杂张量变换需标注 shape 变化。
 
 ## Testing Guidelines
 - Framework: `pytest` with `pytest-cov`.
@@ -46,3 +47,8 @@ Format and lint before opening a PR.
 - Keep commits small and focused; run tests before committing.
 - PRs should include: purpose, affected files/modules, test command/results, and config deltas (for example `configs/train_config.yaml`).
 - If model behavior changes, include representative metric or qualitative output notes in the PR description.
+
+## Execution Focus Rules
+- Before each coding task, read `PROJECT_STATE.md` and only execute the listed “Current In Progress” item to avoid scope drift.
+- After each task, update `PROJECT_STATE.md` with completed work, next 1-3 steps, and artifact paths.
+- If requirements change mid-task, update the “Frozen Decisions” section in `PROJECT_STATE.md` first, then implement.

@@ -18,7 +18,7 @@ import random
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict
 
 import numpy as np
 import torch
@@ -31,10 +31,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from models.boundary_refinement import BoundaryLoss
 from models.enhanced_sam import EnhancedSAM, EnhancedSAMConfig, build_enhanced_sam
 from models.sam_base import load_sam_model, patch_sam_for_img_size
 from utils.data_loader import DatasetConfig, TunnelCrackDataset
+from utils.metrics import SegmentationMetricMeter, ensure_mask_shape, select_final_logits, to_binary
 
 
 def parse_args() -> argparse.Namespace:
@@ -162,43 +162,6 @@ def load_trained_weights(model: EnhancedSAM, checkpoint_path: str, device: torch
     return -1
 
 
-def select_logits(outputs: Dict[str, torch.Tensor]) -> torch.Tensor:
-    """从模型输出中选最终预测 logits。"""
-    if "refined_mask" in outputs:
-        return outputs["refined_mask"]  # [B,1,H,W]
-    masks = outputs["masks"]            # [B,M,H,W]
-    iou_pred = outputs["iou_pred"]      # [B,M]
-    best_idx = iou_pred.argmax(dim=1, keepdim=True)
-    h, w = masks.shape[-2:]
-    return masks.gather(1, best_idx.unsqueeze(-1).unsqueeze(-1).expand(-1, -1, h, w))
-
-
-def ensure_mask_shape(mask: torch.Tensor, target_hw: Tuple[int, int]) -> torch.Tensor:
-    """把标签 mask 调整到目标分辨率。"""
-    if mask.shape[-2:] == target_hw:
-        return mask
-    return torch.nn.functional.interpolate(mask.float(), size=target_hw, mode="nearest")
-
-
-def compute_confusion_counts(pred_bin: torch.Tensor, target_bin: torch.Tensor) -> Dict[str, float]:
-    """统计 TP/FP/FN/TN（按像素级）。"""
-    tp = (pred_bin * target_bin).sum().item()
-    fp = (pred_bin * (1.0 - target_bin)).sum().item()
-    fn = ((1.0 - pred_bin) * target_bin).sum().item()
-    tn = ((1.0 - pred_bin) * (1.0 - target_bin)).sum().item()
-    return {"tp": tp, "fp": fp, "fn": fn, "tn": tn}
-
-
-def compute_boundary_iou(pred_bin: torch.Tensor, target_bin: torch.Tensor, radius: int) -> float:
-    """计算 Boundary-IoU（像素级边界区域 IoU）。"""
-    pred_boundary = BoundaryLoss.get_boundary_mask(pred_bin, radius=radius)
-    gt_boundary = BoundaryLoss.get_boundary_mask(target_bin, radius=radius)
-
-    inter = (pred_boundary * gt_boundary).sum().item()
-    union = ((pred_boundary + gt_boundary) > 0).float().sum().item()
-    return float(inter / (union + 1e-6))
-
-
 @torch.no_grad()
 def evaluate(
     model: EnhancedSAM,
@@ -209,23 +172,12 @@ def evaluate(
 ) -> Dict[str, float]:
     """执行完整评估并返回指标。"""
     model.eval()
-
-    total_loss = 0.0
-    total_samples = 0
-    total_boundary_iou = 0.0
-    total_infer_time = 0.0
-
-    # 全局累积 TP/FP/FN/TN，最后算“数据集级”指标。
-    global_tp = 0.0
-    global_fp = 0.0
-    global_fn = 0.0
-    global_tn = 0.0
+    meter = SegmentationMetricMeter(boundary_radius=boundary_radius)
 
     progress = tqdm(loader, total=len(loader), desc="Eval", leave=False)
     for batch in progress:
         images = batch["image"].to(device, non_blocking=True)
         masks = batch["mask"].to(device, non_blocking=True)
-        bsz = images.shape[0]
 
         # 计时前向推理（不含后处理），用于统计速度。
         if device.type == "cuda":
@@ -234,54 +186,27 @@ def evaluate(
         outputs = model(image=images, multimask=False)
         if device.type == "cuda":
             torch.cuda.synchronize()
-        total_infer_time += (time.perf_counter() - t0)
+        infer_time_sec = time.perf_counter() - t0
 
         loss_dict = model.compute_loss(outputs, masks)
-        pred_logits = select_logits(outputs)
+        pred_logits = select_final_logits(outputs)
 
         # 概率化 + 二值化
         pred_prob = torch.sigmoid(pred_logits)
-        pred_bin = (pred_prob >= threshold).float()
+        pred_bin = to_binary(pred_prob, threshold=threshold)
 
         # 标签尺寸对齐
         masks = ensure_mask_shape(masks, target_hw=pred_bin.shape[-2:])
-        target_bin = (masks >= 0.5).float()
+        target_bin = to_binary(masks, threshold=0.5)
 
-        # 统计混淆矩阵元素
-        counts = compute_confusion_counts(pred_bin, target_bin)
-        global_tp += counts["tp"]
-        global_fp += counts["fp"]
-        global_fn += counts["fn"]
-        global_tn += counts["tn"]
+        meter.update(
+            pred_bin=pred_bin,
+            target_bin=target_bin,
+            infer_time_sec=infer_time_sec,
+            loss_value=float(loss_dict["loss"].item()),
+        )
 
-        # Boundary-IoU（按 batch 求值后再按样本加权）
-        bnd_iou = compute_boundary_iou(pred_bin, target_bin, radius=boundary_radius)
-        total_boundary_iou += bnd_iou * bsz
-
-        total_loss += float(loss_dict["loss"].item()) * bsz
-        total_samples += bsz
-
-    eps = 1e-6
-    precision = global_tp / (global_tp + global_fp + eps)
-    recall = global_tp / (global_tp + global_fn + eps)
-    iou = global_tp / (global_tp + global_fp + global_fn + eps)
-    dice = (2.0 * global_tp) / (2.0 * global_tp + global_fp + global_fn + eps)
-
-    avg_loss = total_loss / max(total_samples, 1)
-    avg_boundary_iou = total_boundary_iou / max(total_samples, 1)
-    ms_per_image = (total_infer_time / max(total_samples, 1)) * 1000.0
-    fps = 1.0 / max(total_infer_time / max(total_samples, 1), 1e-9)
-
-    return {
-        "loss": float(avg_loss),
-        "mIoU": float(iou),  # 二分类前景任务里 mIoU 与前景 IoU 一致使用
-        "Dice": float(dice),
-        "Precision": float(precision),
-        "Recall": float(recall),
-        "Boundary-IoU": float(avg_boundary_iou),
-        "ms_per_image": float(ms_per_image),
-        "FPS": float(fps),
-    }
+    return meter.summary()
 
 
 def main() -> None:
@@ -350,4 +275,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

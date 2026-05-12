@@ -31,6 +31,8 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from models.enhanced_sam import EnhancedSAM, EnhancedSAMConfig, build_enhanced_sam
 from models.sam_base import load_sam_model, patch_sam_for_img_size
+from utils.metrics import select_final_logits
+from utils.visualization import overlay_mask_on_bgr, save_predict_artifacts
 
 
 IMAGE_SUFFIXES: Tuple[str, ...] = (".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff")
@@ -152,17 +154,6 @@ def preprocess_image(image_bgr: np.ndarray, img_size: int) -> Tuple[torch.Tensor
     return image_tensor, image_rgb_resized
 
 
-def select_logits(outputs: Dict[str, torch.Tensor]) -> torch.Tensor:
-    """从模型输出中选最终预测 logits。"""
-    if "refined_mask" in outputs:
-        return outputs["refined_mask"]  # [B,1,H,W]
-    masks = outputs["masks"]            # [B,M,H,W]
-    iou_pred = outputs["iou_pred"]      # [B,M]
-    best_idx = iou_pred.argmax(dim=1, keepdim=True)
-    h, w = masks.shape[-2:]
-    return masks.gather(1, best_idx.unsqueeze(-1).unsqueeze(-1).expand(-1, -1, h, w))
-
-
 @torch.no_grad()
 def predict_one(
     model: EnhancedSAM,
@@ -183,7 +174,7 @@ def predict_one(
 
     # 前向推理
     outputs = model(image=image_tensor, multimask=False)
-    logits = select_logits(outputs)  # [1,1,h,w]
+    logits = select_final_logits(outputs)  # [1,1,h,w]
 
     # logits 分辨率可能小于输入尺寸（如 SAM 的 1/4），插值到 img_size
     logits_up = torch.nn.functional.interpolate(
@@ -200,12 +191,7 @@ def predict_one(
     prob_orig = cv2.resize(prob, (orig_w, orig_h), interpolation=cv2.INTER_LINEAR)
 
     # 叠图（红色区域表示裂缝）
-    overlay = image_bgr.copy()
-    red = np.zeros_like(overlay)
-    red[:, :, 2] = 255
-    alpha = 0.45
-    crack_region = mask_bin_orig > 0
-    overlay[crack_region] = cv2.addWeighted(overlay, 1.0 - alpha, red, alpha, 0)[crack_region]
+    overlay = overlay_mask_on_bgr(image_bgr, mask_bin_orig, color_bgr=(0, 0, 255), alpha=0.45)
 
     return {
         "image_path": str(image_path),
@@ -271,23 +257,21 @@ def main() -> None:
         )
 
         stem = path.stem
-        mask_path = output_dir / f"{stem}_mask.png"
-        cv2.imwrite(str(mask_path), result["mask_bin_orig"])
-
-        overlay_path = output_dir / f"{stem}_overlay.png"
-        if args.save_overlay:
-            cv2.imwrite(str(overlay_path), result["overlay_bgr"])
-
-        prob_path = output_dir / f"{stem}_prob.png"
-        if args.save_prob:
-            prob_u8 = np.clip(result["prob_orig"] * 255.0, 0, 255).astype(np.uint8)
-            cv2.imwrite(str(prob_path), prob_u8)
+        saved = save_predict_artifacts(
+            output_dir=output_dir,
+            stem=stem,
+            mask_u8=result["mask_bin_orig"],
+            save_overlay=bool(args.save_overlay),
+            overlay_bgr=result["overlay_bgr"],
+            save_prob=bool(args.save_prob),
+            prob_float01=result["prob_orig"],
+        )
 
         rec = {
             "image": str(path),
-            "mask": str(mask_path),
-            "overlay": str(overlay_path) if args.save_overlay else "",
-            "prob": str(prob_path) if args.save_prob else "",
+            "mask": saved["mask"],
+            "overlay": saved["overlay"],
+            "prob": saved["prob"],
             "orig_size": result["orig_size"],
         }
         records.append(rec)
@@ -314,4 +298,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
