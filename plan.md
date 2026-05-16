@@ -240,8 +240,20 @@
 - 两个 smoke 均使用真实 SAM 权重、真实 train/val batch 和 CUDA，均通过。
 
 ## 24. M2 P0 r4 full training launch
-1. [ ] 确认没有其他 Python 训练进程运行，避免两个 CUDA 长任务并发。
-2. [ ] 使用 `configs/ablations/m2_lora_r4_polarityfix.yaml` 启动完整 50 epoch 训练。
-3. [ ] 输出目录固定为 `checkpoints/m2_ablation_lora_r4/`，日志固定写入 `logs/m2_ablation_lora_r4_train_*.out.log` 与 `.err.log`。
-4. [ ] 启动后检查进程存在、日志开始写入、没有立即异常退出。
-5. [ ] 更新 `PROJECT_STATE.md` 并提交 Git，保留可回滚记录。
+1. [x] 确认没有其他 Python 训练进程运行，避免两个 CUDA 长任务并发。
+2. [x] 使用 `configs/ablations/m2_lora_r4_polarityfix.yaml` 启动完整 50 epoch 训练。
+3. [x] 输出目录固定为 `checkpoints/m2_ablation_lora_r4/`，日志固定写入 `logs/m2_ablation_lora_r4_train_*.out.log` 与 `.err.log`。
+4. [x] 启动后检查进程存在、日志开始写入、没有立即异常退出。
+5. [x] 更新 `PROJECT_STATE.md` 并提交 Git，保留可回滚记录。
+
+### 执行记录
+- 启动方式：独立 Windows cmd 窗口，避免当前工具会话结束后清理隐藏子进程。
+- 启动时间戳：`20260516_170116`。
+- cmd PID：`12588`。
+- 训练配置：`configs/ablations/m2_lora_r4_polarityfix.yaml`。
+- checkpoint 目录：`checkpoints/m2_ablation_lora_r4/`。
+- 命令记录：`logs/m2_ablation_lora_r4_train_20260516_170116.command.cmd`。
+- PID/路径记录：`logs/m2_ablation_lora_r4_train_20260516_170116.pid.txt`。
+- stdout：`logs/m2_ablation_lora_r4_train_20260516_170116.out.log`。
+- stderr：`logs/m2_ablation_lora_r4_train_20260516_170116.err.log`。
+- 初始检查：cmd 与 Python 进程均存在，日志已写出 `使用设备: cuda`；stderr 仅出现已知坏图 `226_01_01.png` 跳过警告。

@@ -45,12 +45,12 @@ M1（2026-05-05 ~ 2026-05-20）：工程闭环与规范化。
 - 已检查数据切分文件名交叉：`train-val=0`、`train-test=0`、`val-test=0`，未发现重名泄漏。  
 
 ## 4) 当前进行中（只保留1-2项）
-- 决定是否启动 M2 P0 LoRA rank 消融完整训练；如启动，先跑 `m2_lora_r4`，不要并行跑两个长训练。  
+- 监控 M2 P0 `m2_lora_r4` 完整训练，等待首个 checkpoint 与 epoch 指标落盘；不要启动 `r16`。  
 
 ## 5) 下一步（严格按顺序）
-1. 若继续执行消融长训练，先启动 `m2_lora_r4`：配置 `configs/ablations/m2_lora_r4_polarityfix.yaml`，输出 `checkpoints/m2_ablation_lora_r4/`。  
-2. `m2_lora_r4` 完成并评估 val/test 后，再决定是否启动 `m2_lora_r16`。  
-3. 每个长训练启动前必须记录命令、日志路径、PID/进程信息，并在关键节点提交 Git。  
+1. 监控 `logs/m2_ablation_lora_r4_train_20260516_170116.out.log` 和 `.err.log`，确认 epoch 1 正常完成。  
+2. 确认 `checkpoints/m2_ablation_lora_r4/last_model.pth` 与 `best_model.pth` 落盘后记录首轮 train/val 指标。  
+3. `m2_lora_r4` 完成 50 epoch 后，再跑 val/test 评估；在此之前不要启动 `m2_lora_r16`。  
 
 ## 6) 冻结决策（防跑偏）
 - 当前阶段先做 **LoRA 主线**；Boundary 分支后续再启用。  
@@ -198,3 +198,20 @@ M1（2026-05-05 ~ 2026-05-20）：工程闭环与规范化。
   - `analysis/m2_ablation_lora_r4_batch_smoke_2026-05-16.json`
   - `analysis/m2_ablation_lora_r16_batch_smoke_2026-05-16.json`
 - Current In Progress: decide whether to start full P0 rank ablation training, beginning with `m2_lora_r4` only.
+
+## 2026-05-16 Update: M2 P0 r4 full training launched
+- Started full 50-epoch `m2_lora_r4` training with config:
+  - `configs/ablations/m2_lora_r4_polarityfix.yaml`
+- Output checkpoint directory:
+  - `checkpoints/m2_ablation_lora_r4/`
+- Launch metadata:
+  - command: `logs/m2_ablation_lora_r4_train_20260516_170116.command.cmd`
+  - pid/path record: `logs/m2_ablation_lora_r4_train_20260516_170116.pid.txt`
+  - stdout: `logs/m2_ablation_lora_r4_train_20260516_170116.out.log`
+  - stderr: `logs/m2_ablation_lora_r4_train_20260516_170116.err.log`
+- Process check after launch:
+  - cmd PID `12588` alive.
+  - Python training process alive.
+  - stdout contains `[INFO] 使用设备: cuda`.
+  - stderr only shows the known `data/train/images/226_01_01.png` unreadable-image skip warning.
+- Current In Progress: monitor r4 training until first checkpoint/epoch metrics are available; do not launch `m2_lora_r16` concurrently.
