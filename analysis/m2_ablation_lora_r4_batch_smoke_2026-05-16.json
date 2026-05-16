@@ -1,0 +1,32 @@
+{
+  "status": "ok",
+  "device": "cuda",
+  "config": "configs\\ablations\\m2_lora_r4_polarityfix.yaml",
+  "sam_checkpoint": "checkpoints\\sam_vit_b_01ec64.pth",
+  "train_dataset_count": 11058,
+  "val_dataset_count": 1591,
+  "train_mask": {
+    "shape": [
+      4,
+      1,
+      512,
+      512
+    ],
+    "sum": 13472.0,
+    "foreground_ratio": 0.012847900390625
+  },
+  "val_mask": {
+    "shape": [
+      4,
+      1,
+      512,
+      512
+    ],
+    "sum": 24474.0,
+    "foreground_ratio": 0.023340225219726562
+  },
+  "train_loss": 4.315237998962402,
+  "train_iou": 0.007717997767031193,
+  "val_loss": 5.097843647003174,
+  "val_iou": 0.004970007576048374
+}

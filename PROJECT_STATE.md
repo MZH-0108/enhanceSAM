@@ -45,12 +45,12 @@ M1（2026-05-05 ~ 2026-05-20）：工程闭环与规范化。
 - 已检查数据切分文件名交叉：`train-val=0`、`train-test=0`、`val-test=0`，未发现重名泄漏。  
 
 ## 4) 当前进行中（只保留1-2项）
-- 创建 M2 消融实验首批 P0 配置并做预检，暂不启动完整训练。  
+- 决定是否启动 M2 P0 LoRA rank 消融完整训练；如启动，先跑 `m2_lora_r4`，不要并行跑两个长训练。  
 
 ## 5) 下一步（严格按顺序）
-1. 创建 `configs/ablations/m2_lora_r4_polarityfix.yaml` 与 `configs/ablations/m2_lora_r16_polarityfix.yaml`，只修改 LoRA rank/alpha，其余继承 corrected 主线配置。  
-2. 运行消融预检测试：`tests/test_mask_utils.py`、`tests/test_data_loader.py`、`tests/test_train_smoke.py`，使用仓库内 `--basetemp`。  
-3. 对两个 P0 配置分别做一轮轻量 smoke/probe，确认配置可构建模型并能输出 checkpoint，再决定是否启动完整训练。  
+1. 若继续执行消融长训练，先启动 `m2_lora_r4`：配置 `configs/ablations/m2_lora_r4_polarityfix.yaml`，输出 `checkpoints/m2_ablation_lora_r4/`。  
+2. `m2_lora_r4` 完成并评估 val/test 后，再决定是否启动 `m2_lora_r16`。  
+3. 每个长训练启动前必须记录命令、日志路径、PID/进程信息，并在关键节点提交 Git。  
 
 ## 6) 冻结决策（防跑偏）
 - 当前阶段先做 **LoRA 主线**；Boundary 分支后续再启用。  
@@ -185,3 +185,16 @@ M1（2026-05-05 ~ 2026-05-20）：工程闭环与规范化。
   - P2: Boundary refinement branch
 - Decision: do not start full ablation training until P0 config files and preflight/smoke checks pass.
 - Current In Progress: create P0 ablation configs and run preflight only.
+
+## 2026-05-16 Update: M2 P0 ablation configs and smoke preflight completed
+- Added P0 LoRA-rank ablation configs:
+  - `configs/ablations/m2_lora_r4_polarityfix.yaml`
+  - `configs/ablations/m2_lora_r16_polarityfix.yaml`
+- Verified both configs differ from `configs/m2_lora_polarityfix_config.yaml` only by `lora.rank` and `lora.alpha`.
+- Preflight tests passed:
+  - `.\venv\Scripts\python.exe -m pytest tests\test_mask_utils.py tests\test_data_loader.py tests\test_train_smoke.py -v --basetemp analysis\pytest_tmp_ablation_preflight`
+  - result: `7 passed`, 1 known albumentations online-version warning.
+- Real one-batch smoke passed for both P0 configs:
+  - `analysis/m2_ablation_lora_r4_batch_smoke_2026-05-16.json`
+  - `analysis/m2_ablation_lora_r16_batch_smoke_2026-05-16.json`
+- Current In Progress: decide whether to start full P0 rank ablation training, beginning with `m2_lora_r4` only.

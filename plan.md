@@ -224,3 +224,17 @@
 - 消融计划：`analysis/m2_ablation_plan_2026-05-16.md`。
 - 消融计划 CSV：`paper/tables/m2_ablation_plan.csv`。
 - 下一步只做 P0 配置与预检：`m2_lora_r4`、`m2_lora_r16`；暂不启动完整训练。
+
+## 23. M2 P0 ablation config and smoke preflight
+1. [x] 创建 `configs/ablations/m2_lora_r4_polarityfix.yaml`，仅将 `lora.rank=4`、`lora.alpha=8.0`。
+2. [x] 创建 `configs/ablations/m2_lora_r16_polarityfix.yaml`，仅将 `lora.rank=16`、`lora.alpha=32.0`。
+3. [x] 校验两个配置相对 `configs/m2_lora_polarityfix_config.yaml` 只变更 rank/alpha。
+4. [x] 运行预检测试：`tests/test_mask_utils.py`、`tests/test_data_loader.py`、`tests/test_train_smoke.py`，结果 `7 passed`。
+5. [x] 对 `m2_lora_r4` 运行真实数据 one-batch smoke。
+6. [x] 对 `m2_lora_r16` 运行真实数据 one-batch smoke。
+7. [ ] 更新 `PROJECT_STATE.md` 并提交预检报告。
+
+### 执行记录
+- `r4` smoke 报告：`analysis/m2_ablation_lora_r4_batch_smoke_2026-05-16.json`，train_loss=`4.315238`，val_loss=`5.097844`。
+- `r16` smoke 报告：`analysis/m2_ablation_lora_r16_batch_smoke_2026-05-16.json`，train_loss=`4.412747`，val_loss=`4.947453`。
+- 两个 smoke 均使用真实 SAM 权重、真实 train/val batch 和 CUDA，均通过。
