@@ -61,6 +61,8 @@ Thumbs.db
 .tmp_ppt/
 .vendor/
 tmp-ppt/
+analysis/pytest_tmp*/
+analysis/pytest_tmp_*/
 
 # Results
 results/
