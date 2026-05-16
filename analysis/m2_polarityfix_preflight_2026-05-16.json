@@ -1,0 +1,121 @@
+{
+  "status": "ok",
+  "data_root": "data",
+  "config": "configs\\m2_lora_polarityfix_config.yaml",
+  "sam_checkpoint": "checkpoints\\sam_vit_b_01ec64.pth",
+  "sam_sha256": "EC2DF62732614E57411CDCF32A23FFDF28910380D03139EE0F4FCBE91EB8C912",
+  "config_summary": {
+    "model_type": "vit_b",
+    "img_size": 512,
+    "batch_size": 4,
+    "epochs": 50,
+    "num_workers": 0,
+    "lr": 0.0001,
+    "boundary_enabled": false
+  },
+  "splits": {
+    "train": {
+      "annotations": {
+        "count": 11059,
+        "raw_white_majority": 8710,
+        "raw_black_majority": 2349,
+        "raw_white_ratio_min": 0.001007080078125,
+        "raw_white_ratio_median": 0.978851318359375,
+        "raw_white_ratio_max": 0.9990386962890625,
+        "normalized_crack_ratio_min": 0.0009613037109375,
+        "normalized_crack_ratio_median": 0.013744354248046875,
+        "normalized_crack_ratio_max": 0.09602165222167969,
+        "empty_after_normalize": [],
+        "too_large_after_normalize": []
+      },
+      "dataset": {
+        "dataset_count": 11058,
+        "first_image_shape": [
+          3,
+          512,
+          512
+        ],
+        "first_mask_shape": [
+          1,
+          512,
+          512
+        ],
+        "first_mask_sum": 3636.0,
+        "first_image_path": "data\\train\\images\\0_01_01.png",
+        "first_mask_path": "data\\train\\annotations\\0_01_01.png"
+      }
+    },
+    "val": {
+      "annotations": {
+        "count": 1591,
+        "raw_white_majority": 1088,
+        "raw_black_majority": 503,
+        "raw_white_ratio_min": 0.001026153564453125,
+        "raw_white_ratio_median": 0.9748687744140625,
+        "raw_white_ratio_max": 0.9983062744140625,
+        "normalized_crack_ratio_min": 0.001026153564453125,
+        "normalized_crack_ratio_median": 0.011122703552246094,
+        "normalized_crack_ratio_max": 0.09568119049072266,
+        "empty_after_normalize": [],
+        "too_large_after_normalize": []
+      },
+      "dataset": {
+        "dataset_count": 1591,
+        "first_image_shape": [
+          3,
+          512,
+          512
+        ],
+        "first_mask_shape": [
+          1,
+          512,
+          512
+        ],
+        "first_mask_sum": 3687.0,
+        "first_image_path": "data\\val\\images\\1001_03_01.png",
+        "first_mask_path": "data\\val\\annotations\\1001_03_01.png"
+      }
+    },
+    "test": {
+      "annotations": {
+        "count": 1594,
+        "raw_white_majority": 1090,
+        "raw_black_majority": 504,
+        "raw_white_ratio_min": 0.001033782958984375,
+        "raw_white_ratio_median": 0.975766658782959,
+        "raw_white_ratio_max": 0.9990386962890625,
+        "normalized_crack_ratio_min": 0.0009613037109375,
+        "normalized_crack_ratio_median": 0.011501789093017578,
+        "normalized_crack_ratio_max": 0.09568119049072266,
+        "empty_after_normalize": [],
+        "too_large_after_normalize": []
+      },
+      "dataset": {
+        "dataset_count": 1594,
+        "first_image_shape": [
+          3,
+          512,
+          512
+        ],
+        "first_mask_shape": [
+          1,
+          512,
+          512
+        ],
+        "first_mask_sum": 7453.0,
+        "first_image_path": "data\\test\\images\\1002_06_01.png",
+        "first_mask_path": "data\\test\\annotations\\1002_06_01.png"
+      }
+    }
+  },
+  "representatives": {
+    "214_05_01": {
+      "raw_white_ratio": 0.9043188095092773,
+      "normalized_crack_ratio": 0.09568119049072266
+    },
+    "mosaic_1561": {
+      "raw_white_ratio": 0.005523681640625,
+      "normalized_crack_ratio": 0.005523681640625
+    }
+  }
+}

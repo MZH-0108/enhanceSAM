@@ -1,0 +1,63 @@
+# M2 统一评估配置（2026-05-13）
+#
+# 目的：
+# - 固化 SAM-AMG / SAM-Box-Oracle / SAM+LoRA 三组 val 对比的输入、参数与输出路径。
+# - 后续所有 M2 指标表必须从这里约定的 JSON 产物读取，避免评估口径漂移。
+
+common:
+  data_root: "data"
+  split: "val"
+  device: "cuda"
+  model_type: "vit_b"
+  sam_checkpoint: "checkpoints/sam_vit_b_01ec64.pth"
+  boundary_radius: 3
+
+outputs:
+  baseline_dir: "results/baselines"
+  enhanced_dir: "results/enhanced"
+  analysis_dir: "analysis"
+  paper_table_dir: "paper/tables"
+
+sam_amg:
+  entry: "baselines/sam_vanilla/eval_amg.py"
+  output: "results/baselines/sam_amg_val_gpu.json"
+  params:
+    min_area: 30
+    max_area_ratio: 0.2
+    min_elongation: 2.5
+    min_pred_iou: 0.75
+    points_per_side: 32
+    pred_iou_thresh: 0.86
+    stability_score_thresh: 0.92
+    crop_n_layers: 1
+    crop_n_points_downscale_factor: 2
+    min_mask_region_area: 20
+
+sam_box_oracle:
+  entry: "baselines/sam_vanilla/eval_box_oracle.py"
+  output: "results/baselines/sam_box_oracle_val_gpu.json"
+  params:
+    padding: 8
+    use_components: true
+    min_component_area: 20
+
+sam_lora:
+  entry: "scripts/eval.py"
+  train_entry: "scripts/train.py"
+  train_config: "configs/train_config.yaml"
+  checkpoint: "checkpoints/m2_lora/best_model.pth"
+  output: "results/enhanced/sam_lora_val_gpu.json"
+  params:
+    batch_size: 4
+    num_workers: 4
+    threshold: 0.5
+
+status:
+  cuda_verified: true
+  torch_version: "2.11.0+cu128"
+  torch_cuda: "12.8"
+  gpu: "NVIDIA GeForce RTX 5080"
+  sam_checkpoint_ready: true
+  sam_amg_ready: true
+  sam_box_oracle_ready: true
+  sam_lora_checkpoint_ready: false

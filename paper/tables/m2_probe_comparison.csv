@@ -1,0 +1,4 @@
+method,mIoU,Dice,Precision,Recall,Boundary-IoU,FPS,note
+SAM-AMG,0.012200,0.024107,0.480311,0.012364,0.017539,0.317026,vanilla automatic mask generator
+SAM-Box-Oracle,0.890213,0.941918,0.988996,0.899119,0.132016,8.909702,GT-box prompted upper-bound reference
+SAM+LoRA-probe,0.986607,0.993258,0.989088,0.997464,0.490773,53.844907,1 epoch probe checkpoint; not final paper result

@@ -1,0 +1,4 @@
+Method,mIoU,Dice,Precision,Recall,Boundary-IoU,FPS,ms_per_image,Source
+SAM-AMG,0.044840,0.085830,0.077845,0.095641,0.029975,0.3512,2847.0416,results/baselines/sam_amg_polarityfix_val_gpu.json
+SAM-Box-Oracle,0.070797,0.132233,0.073671,0.644718,0.179169,11.1135,89.9808,results/baselines/sam_box_oracle_polarityfix_val_gpu.json
+SAM+LoRA,0.708027,0.829059,0.772059,0.895146,0.825317,50.0147,19.9941,results/enhanced/sam_lora_polarityfix_val_gpu.json
