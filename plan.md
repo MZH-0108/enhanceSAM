@@ -273,3 +273,4 @@
 - Progress/stderr log: `logs/m2_ablation_lora_r4_train_20260516_170116.err.log`
 - Checkpoint directory: `checkpoints/m2_ablation_lora_r4/`
 - Epoch 1 metrics: `train_loss=1.1755`, `train_iou=0.5381`, `val_loss=0.9691`, `val_iou=0.5715`, `best=0.5715`
+- Epoch 2 metrics: `train_loss=0.9384`, `train_iou=0.5969`, `val_loss=0.9317`, `val_iou=0.5812`, `best=0.5812`
