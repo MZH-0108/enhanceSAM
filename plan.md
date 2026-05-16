@@ -238,3 +238,10 @@
 - `r4` smoke 报告：`analysis/m2_ablation_lora_r4_batch_smoke_2026-05-16.json`，train_loss=`4.315238`，val_loss=`5.097844`。
 - `r16` smoke 报告：`analysis/m2_ablation_lora_r16_batch_smoke_2026-05-16.json`，train_loss=`4.412747`，val_loss=`4.947453`。
 - 两个 smoke 均使用真实 SAM 权重、真实 train/val batch 和 CUDA，均通过。
+
+## 24. M2 P0 r4 full training launch
+1. [ ] 确认没有其他 Python 训练进程运行，避免两个 CUDA 长任务并发。
+2. [ ] 使用 `configs/ablations/m2_lora_r4_polarityfix.yaml` 启动完整 50 epoch 训练。
+3. [ ] 输出目录固定为 `checkpoints/m2_ablation_lora_r4/`，日志固定写入 `logs/m2_ablation_lora_r4_train_*.out.log` 与 `.err.log`。
+4. [ ] 启动后检查进程存在、日志开始写入、没有立即异常退出。
+5. [ ] 更新 `PROJECT_STATE.md` 并提交 Git，保留可回滚记录。
