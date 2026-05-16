@@ -275,3 +275,5 @@
 - Epoch 1 metrics: `train_loss=1.1755`, `train_iou=0.5381`, `val_loss=0.9691`, `val_iou=0.5715`, `best=0.5715`
 - Epoch 2 metrics: `train_loss=0.9384`, `train_iou=0.5969`, `val_loss=0.9317`, `val_iou=0.5812`, `best=0.5812`
 - Epoch 3 metrics: `train_loss=0.9085`, `train_iou=0.6052`, `val_loss=0.9090`, `val_iou=0.5926`, `best=0.5926`
+- Epoch 4 metrics: `train_loss=0.8907`, `train_iou=0.6107`, `val_loss=0.8925`, `val_iou=0.5967`, `best=0.5967`
+- Epoch 5 metrics: `train_loss=0.8770`, `train_iou=0.6149`, `val_loss=0.8818`, `val_iou=0.6005`, `best=0.6005`

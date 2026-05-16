@@ -267,3 +267,23 @@ M1（2026-05-05 ~ 2026-05-20）：工程闭环与规范化。
 - Training has entered epoch 4; stderr tail showed about `8%` of epoch 4 at the latest check.
 - No image artifacts were generated in this monitoring step, so no image2 inspection was required.
 - Current In Progress: continue monitoring `m2_lora_r4` until full 50-epoch completion; do not launch `m2_lora_r16` until r4 completes and is evaluated.
+
+## 2026-05-16 Update: M2 P0 r4 epoch 5 milestone confirmed
+- Confirmed `m2_lora_r4` completed the first 5 epochs and continued into epoch 6.
+- Epoch 4 metrics:
+  - `train_loss=0.8907`
+  - `train_iou=0.6107`
+  - `val_loss=0.8925`
+  - `val_iou=0.5967`
+  - `best=0.5967`
+- Epoch 5 metrics:
+  - `train_loss=0.8770`
+  - `train_iou=0.6149`
+  - `val_loss=0.8818`
+  - `val_iou=0.6005`
+  - `best=0.6005`
+- Checkpoints refreshed under `checkpoints/m2_ablation_lora_r4/`; `best_model.pth` and `last_model.pth` were both updated after epoch 5.
+- First 5-epoch trend: validation IoU improved from `0.5715` to `0.6005`.
+- Training has entered epoch 6; stderr tail showed about `10%` of epoch 6 at the latest check.
+- No image artifacts were generated in this monitoring step, so no image2 inspection was required.
+- Current In Progress: continue monitoring `m2_lora_r4` until full 50-epoch completion; next planned status commit at a meaningful milestone or at completion.
