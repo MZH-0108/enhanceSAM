@@ -1,0 +1,32 @@
+{
+  "status": "ok",
+  "device": "cuda",
+  "config": "configs\\ablations\\m2_loss_pos5_polarityfix.yaml",
+  "sam_checkpoint": "checkpoints\\sam_vit_b_01ec64.pth",
+  "train_dataset_count": 11058,
+  "val_dataset_count": 1591,
+  "train_mask": {
+    "shape": [
+      4,
+      1,
+      512,
+      512
+    ],
+    "sum": 17490.0,
+    "foreground_ratio": 0.016679763793945312
+  },
+  "val_mask": {
+    "shape": [
+      4,
+      1,
+      512,
+      512
+    ],
+    "sum": 24474.0,
+    "foreground_ratio": 0.023340225219726562
+  },
+  "train_loss": 4.053182601928711,
+  "train_iou": 0.004605857189744711,
+  "val_loss": 4.637941360473633,
+  "val_iou": 0.004218509886413813
+}

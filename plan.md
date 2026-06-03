@@ -277,3 +277,39 @@
 - Epoch 3 metrics: `train_loss=0.9085`, `train_iou=0.6052`, `val_loss=0.9090`, `val_iou=0.5926`, `best=0.5926`
 - Epoch 4 metrics: `train_loss=0.8907`, `train_iou=0.6107`, `val_loss=0.8925`, `val_iou=0.5967`, `best=0.5967`
 - Epoch 5 metrics: `train_loss=0.8770`, `train_iou=0.6149`, `val_loss=0.8818`, `val_iou=0.6005`, `best=0.6005`
+
+## 26. 本次任务计划（2026-06-03，阶段成果上传与 P1 下一步）
+1. [x] 复读 `AGENTS.md`、`PROJECT_STATE.md` 与 `plan.md`，确认当前真实进度为 P1 `m2_loss_pos20` 训练后评估闭环。
+2. [x] 检查本地 Git/GitHub 上传条件：当前 shell 未找到 `git` 命令，且 `.git/config` 暂无 GitHub remote。
+3. [x] 确认 `m2_loss_pos20` 训练已结束：stdout 显示早停，最佳监控 `val_iou=0.6322`，`best_model.pth` 与 `last_model.pth` 均已落盘。
+4. [ ] 阻塞：当前 shell 未找到 `git`，`.git/config` 暂无 GitHub remote，GitHub 连接器也因网络/backend 请求失败，暂不能上传阶段成果。
+5. [ ] 阻塞：当前 `venv\Scripts\python.exe` 指向缺失的旧 Conda 解释器，暂不能运行 `scripts/eval.py` 完成 `m2_loss_pos20` 正式 val/test 评估。
+6. [ ] 恢复 Git/Python 环境后，先评估 `m2_loss_pos20`，再汇总 `r16`、`m2_loss_pos5`、`m2_loss_pos20` 的 P1 对比结果并回写 `PROJECT_STATE.md`。
+
+## 27. 本次任务计划（2026-06-03，重装系统后环境恢复）
+1. [x] 复读 `AGENTS.md`、`PROJECT_STATE.md` 与 `plan.md`，确认当前阻塞是本地 Git/Python 环境缺失。
+2. [x] 检查系统包管理器与已有 Python/Git 状态。
+3. [x] 安装 Git 与可用 Python 运行时。
+4. [x] 删除并重建损坏的 `venv`，使用 Python 3.10.11、`uv`、CUDA PyTorch 恢复项目依赖。
+5. [x] 验证 `git --version`、CUDA PyTorch、关键导入与 `tests/test_train_smoke.py`；smoke 结果 `1 passed`。
+6. [x] 完成 `m2_loss_pos20` 正式 val/test 评估，输出 JSON、P1 汇总 CSV 与分析报告。
+7. [x] 更新 `PROJECT_STATE.md`，记录环境恢复结果、运行时 flags 与下一步 GitHub remote/上传任务。
+
+## 28. 本次任务计划（2026-06-03，阶段成果 GitHub 上传）
+1. [x] 复读 `AGENTS.md`、`PROJECT_STATE.md` 与 `plan.md`，确认当前只执行阶段成果上传。
+2. [x] 使用用户提供的 GitHub 地址配置远端：`https://github.com/MZH-0108/enhanceSAM.git`。
+3. [ ] 检查 Git 状态，仅暂存可追踪的阶段文档、配置与论文表格成果，不强制加入被 `.gitignore` 忽略的运行产物。
+4. [ ] 按仓库提交规范创建阶段成果提交。
+5. [ ] 推送当前分支到 GitHub，并在 `PROJECT_STATE.md` 记录 remote、commit、branch 与下一步。
+
+### 第 28 节阻塞记录
+- [x] 已确认 GitHub 地址：`https://github.com/MZH-0108/enhanceSAM.git`。
+- [x] 已确认本机 Git 可用：`C:\Program Files\Git\cmd\git.exe`。
+- [x] 上传阻塞原因：`.git/config` 存在旧系统 SID 的 Deny ACL，导致 remote/commit 等 Git 元数据写入失败。
+- [x] 已尝试 escalated 授权 3 次，自动授权审查均超时；GitHub connector 当前也不可用。
+- [ ] 修复 `.git` ACL 后继续配置 remote、commit、push。
+
+### 第 28 节追加阻塞记录
+- [x] 用户宿主 PowerShell 已显示 `.git` Deny ACL 被移除。
+- [x] Codex 沙箱内仍读到 `.git` Deny ACL，且 `git remote` 写入 `.git/config` 失败。
+- [ ] 需要宿主 PowerShell 手动完成 Git 上传，或重启 Codex 刷新沙箱 ACL 后继续。

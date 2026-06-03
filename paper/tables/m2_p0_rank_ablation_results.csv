@@ -1,0 +1,7 @@
+experiment,rank,alpha,checkpoint,best_epoch,split,mIoU,Dice,Precision,Recall,Boundary-IoU,FPS,loss,delta_mIoU_vs_r8,delta_Boundary-IoU_vs_r8
+m2_lora_r4,4,8.0,checkpoints/m2_ablation_lora_r4/best_model.pth,46,val,0.701067,0.824267,0.763628,0.895368,0.820465,50.489337,0.800706,-0.006961,-0.004852
+m2_lora_r4,4,8.0,checkpoints/m2_ablation_lora_r4/best_model.pth,46,test,0.697111,0.821527,0.760079,0.893784,0.818568,49.969437,0.810264,-0.006257,-0.003994
+m2_lora_r8,8,16.0,checkpoints/m2_lora_polarityfix/best_model.pth,44,val,0.708027,0.829059,0.772059,0.895146,0.825317,50.014706,0.791307,0.000000,0.000000
+m2_lora_r8,8,16.0,checkpoints/m2_lora_polarityfix/best_model.pth,44,test,0.703368,0.825856,0.767555,0.893740,0.822562,50.297236,0.798718,0.000000,0.000000
+m2_lora_r16,16,32.0,checkpoints/m2_ablation_lora_r16/best_model.pth,49,val,0.714335,0.833367,0.780902,0.893390,0.829867,49.813337,0.779706,0.006308,0.004550
+m2_lora_r16,16,32.0,checkpoints/m2_ablation_lora_r16/best_model.pth,49,test,0.710653,0.830856,0.777628,0.891905,0.829133,50.551171,0.789546,0.007285,0.006571
