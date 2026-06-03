@@ -73,3 +73,7 @@ reports/*.pdf
 
 # SAM pretrained weights
 sam_*.pth
+
+# Internal planning/state notes
+plan.md
+PROJECT_STATE.md
