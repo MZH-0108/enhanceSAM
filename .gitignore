@@ -24,6 +24,7 @@ wheels/
 venv/
 env/
 ENV/
+venv_broken_*/
 
 # IDE
 .idea/
@@ -63,6 +64,9 @@ Thumbs.db
 tmp-ppt/
 analysis/pytest_tmp*/
 analysis/pytest_tmp_*/
+analysis/tmp_*/
+analysis/tmp_*.*
+analysis/pycache_runtime*/
 
 # Results
 results/

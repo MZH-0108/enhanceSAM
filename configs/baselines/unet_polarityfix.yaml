@@ -1,0 +1,45 @@
+# UNet baseline after mask polarity normalization.
+# This config uses the same 512x512 input and positive-class weighting as the SAM+LoRA main line.
+
+model:
+  name: "unet"
+  img_size: 512
+  in_channels: 3
+  out_channels: 1
+  base_channels: 32
+
+loss:
+  w_bce: 1.0
+  w_dice: 2.0
+  pos_weight: 10.0
+  boundary_radius: 3
+
+training:
+  batch_size: 4
+  epochs: 50
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  num_workers: 0
+
+optimizer:
+  type: "adamw"
+
+scheduler:
+  type: "cosine"
+  min_lr: 1.0e-6
+
+augmentation:
+  horizontal_flip: 0.5
+  vertical_flip: 0.5
+
+checkpoint:
+  save_interval: 1
+  monitor: "val_iou"
+
+logging:
+  log_interval: 10
+
+early_stopping:
+  enabled: true
+  patience: 10
+  min_delta: 0.0001

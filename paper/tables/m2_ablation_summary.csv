@@ -1,0 +1,16 @@
+section,experiment,setting,split,mIoU,Dice,Precision,Recall,Boundary-IoU,FPS,loss_or_ms,main_observation
+Main comparison,SAM-AMG,automatic mask generation,val,0.044840,0.085830,0.077845,0.095641,0.029975,0.3512,2847.0416 ms/image,Generic SAM automatic masks are not suitable for thin tunnel-crack foregrounds.
+Main comparison,SAM-Box-Oracle,oracle box prompt,val,0.070797,0.132233,0.073671,0.644718,0.179169,11.1135,89.9808 ms/image,Box prompts improve recall but still fail to produce accurate crack regions.
+Main comparison,SAM+LoRA,polarity-fixed LoRA r8,val,0.708027,0.829059,0.772059,0.895146,0.825317,50.0147,0.791307,Domain-adapted SAM substantially improves region and boundary metrics.
+P0 rank ablation,m2_lora_r4,rank=4 alpha=8,val,0.701067,0.824267,0.763628,0.895368,0.820465,50.489337,0.800706,Lower rank underperforms r8 and r16 on mIoU and Boundary-IoU.
+P0 rank ablation,m2_lora_r4,rank=4 alpha=8,test,0.697111,0.821527,0.760079,0.893784,0.818568,49.969437,0.810264,Test trend matches validation; r4 is not preferred.
+P0 rank ablation,m2_lora_r8,rank=8 alpha=16,val,0.708027,0.829059,0.772059,0.895146,0.825317,50.014706,0.791307,Main corrected M2 checkpoint; stronger than r4 but below r16.
+P0 rank ablation,m2_lora_r8,rank=8 alpha=16,test,0.703368,0.825856,0.767555,0.893740,0.822562,50.297236,0.798718,Stable generalization with small val/test gap.
+P0 rank ablation,m2_lora_r16,rank=16 alpha=32,val,0.714335,0.833367,0.780902,0.893390,0.829867,49.813337,0.779706,Best rank setting among r4/r8/r16.
+P0 rank ablation,m2_lora_r16,rank=16 alpha=32,test,0.710653,0.830856,0.777628,0.891905,0.829133,50.551171,0.789546,Preferred base for P1 loss-weight ablations.
+P1 loss-weight ablation,m2_lora_r16,pos_weight=10,val,0.714335,0.833367,0.780902,0.893390,0.829867,49.813337,0.779706,Default positive weight baseline for P1.
+P1 loss-weight ablation,m2_lora_r16,pos_weight=10,test,0.710653,0.830856,0.777628,0.891905,0.829133,50.551171,0.789546,Default positive weight baseline for P1.
+P1 loss-weight ablation,m2_loss_pos5,pos_weight=5,val,0.717540,0.835544,0.803034,0.870796,0.832180,48.719600,0.706827,Best overall P1 setting; improves precision and boundary quality.
+P1 loss-weight ablation,m2_loss_pos5,pos_weight=5,test,0.713155,0.832563,0.799054,0.869007,0.831468,48.355191,0.711661,Consistent test improvement over r16 default.
+P1 loss-weight ablation,m2_loss_pos20,pos_weight=20,val,0.701154,0.824327,0.748764,0.916854,0.822576,48.697126,0.896909,Higher recall but over-expands foreground and hurts global quality.
+P1 loss-weight ablation,m2_loss_pos20,pos_weight=20,test,0.696770,0.821290,0.744262,0.916103,0.820676,48.808804,0.909249,Not preferred despite recall gain.
