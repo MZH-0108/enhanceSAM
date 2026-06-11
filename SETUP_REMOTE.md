@@ -198,10 +198,14 @@ claude
 启动后它会自动读取仓库根目录的 **`CLAUDE.md`**（项目架构、约定、已知坑都在里面），无需重新交代背景。
 
 **建议第一句话告诉它当前任务**，例如：
-> 先读 CLAUDE.md 和 analysis\ 下最新的实验记录。当前要解决的是“指标口径”问题：
-> 给 utils\metrics.py 增量加上 macro（逐图平均）的前景 IoU/Dice，与现有 micro 指标并列输出；
-> 并支持在原分辨率评估。然后用 m2_lora_polarityfix 的 checkpoint 在 val 上重新评估，
-> 对比 micro 与 macro 的差距，定位效果图质量问题。
+> 先读 CLAUDE.md、SETUP_REMOTE.md 和 analysis\ 下最新实验记录。
+> 项目现状：utils\metrics.py 已新增 mIoU_macro/Dice_macro（逐图平均）并合并到 main
+> （commit 5dd902e）。当前任务：按本文件配好环境后，用
+> checkpoints\m2_lora_polarityfix\best_model.pth 在 val 上重新 eval
+> —— `--config` 必须用训练时对应的 configs\m2_lora_polarityfix_config.yaml，
+> 否则 LoRA 结构不匹配会导致 load_state_dict 失败 —— 然后对比输出 JSON 里的
+> mIoU(micro) 与 mIoU_macro。若 macro 明显低于 micro，即确认“整体指标虚高、
+> 多数细裂缝效果图差”的根因，再决定是否重训。
 
 ---
 
