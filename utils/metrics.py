@@ -4,7 +4,8 @@
 1) 从模型输出中抽取最终 mask logits；
 2) 预测/标签尺寸对齐与二值化；
 3) TP/FP/FN/TN 累积统计；
-4) mIoU / Dice / Precision / Recall / Boundary-IoU / 速度指标汇总。
+4) mIoU/Dice（micro 全局像素聚合）+ mIoU_macro/Dice_macro（逐图平均）
+   / Precision / Recall / Boundary-IoU / 速度指标汇总。
 """
 
 from __future__ import annotations
@@ -78,6 +79,10 @@ class SegmentationMetricMeter:
     def __init__(self, boundary_radius: int = 3) -> None:
         self.boundary_radius = int(boundary_radius)
         self.conf = _Confusion()
+        # 逐图(macro)累积器：每张图各自算 IoU/Dice 再累加，summary 时除以样本数得样本平均。
+        # 与全局(micro)混淆矩阵并列：micro 易被大前景样本主导，macro 更贴近“平均每张图”的观感。
+        self.total_img_iou = 0.0
+        self.total_img_dice = 0.0
         self.total_boundary_iou = 0.0
         self.total_samples = 0
         self.total_infer_time_sec = 0.0
@@ -98,6 +103,19 @@ class SegmentationMetricMeter:
         self.conf.fp += float((pred_bin * (1.0 - target_bin)).sum().item())
         self.conf.fn += float(((1.0 - pred_bin) * target_bin).sum().item())
         self.conf.tn += float(((1.0 - pred_bin) * (1.0 - target_bin)).sum().item())
+
+        # 逐图(macro)IoU/Dice：对每个样本在 (C,H,W) 维度各自求 tp/fp/fn，
+        # 单独算 IoU/Dice 后累加；这样占多数的细裂缝小图也能等权参与平均，
+        # 不会像 micro 那样被少数大前景样本淹没。
+        eps = 1e-6
+        per_img_dims = tuple(range(1, pred_bin.ndim))
+        tp_i = (pred_bin * target_bin).sum(dim=per_img_dims)
+        fp_i = (pred_bin * (1.0 - target_bin)).sum(dim=per_img_dims)
+        fn_i = ((1.0 - pred_bin) * target_bin).sum(dim=per_img_dims)
+        iou_i = tp_i / (tp_i + fp_i + fn_i + eps)
+        dice_i = (2.0 * tp_i) / (2.0 * tp_i + fp_i + fn_i + eps)
+        self.total_img_iou += float(iou_i.sum().item())
+        self.total_img_dice += float(dice_i.sum().item())
 
         self.total_boundary_iou += boundary_iou(pred_bin, target_bin, radius=self.boundary_radius) * bsz
         self.total_infer_time_sec += float(infer_time_sec)
@@ -124,8 +142,13 @@ class SegmentationMetricMeter:
         fps = 1.0 / max(sec_per_image, 1e-9)
 
         metrics = {
+            # micro（全局像素聚合）口径：本质是“裂缝前景类”的全局 IoU/Dice，
+            # 非跨类别平均，且会被大前景样本主导。保留原 key 不变以兼容历史结果。
             "mIoU": float(miou),
             "Dice": float(dice),
+            # macro（逐图平均）口径：更贴近“平均每张图分得怎样”，论文建议同时报告。
+            "mIoU_macro": float(self.total_img_iou / max(self.total_samples, 1)),
+            "Dice_macro": float(self.total_img_dice / max(self.total_samples, 1)),
             "Precision": float(precision),
             "Recall": float(recall),
             "Boundary-IoU": float(self.total_boundary_iou / max(self.total_samples, 1)),
